@@ -1,2 +1,2 @@
 # osti
-Automated Context-Aware PersonalisedMusic Recommendation System - MEng Project
+Automated Context-Aware Personalised Music Recommendation System - MEng Project

@@ -9,4 +9,20 @@ module.exports = class DB {
     const user = await db.collection("users").findOne(ObjectId(user_id));
     return user;
   }
+
+  static async getKnownSongIDs(lastfm_urls) {
+    const { db } = await DBController.connectToDatabase();
+    const knownSongs = await db
+      .collection("tracks")
+      .find({ lastfm_url: { $in: lastfm_urls } }, { fields: { lastfm_url: 1 } })
+      .toArray();
+    return knownSongs;
+  }
+
+  static async addTracks(tracks) {
+    const { db } = await DBController.connectToDatabase();
+    // Add createdat and updatedat fields
+    const trackIDs = await db.collection("tracks").insertMany(tracks);
+    return trackIDs.ops.map(({ _id, lastfm_url }) => ({ _id, lastfm_url }));
+  }
 };

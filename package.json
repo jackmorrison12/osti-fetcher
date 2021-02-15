@@ -27,7 +27,8 @@
     "express": "^4.17.1",
     "lastfm": "^0.9.3",
     "lastfm-node-client": "^2.2.0",
-    "mongodb": "^3.6.4"
+    "mongodb": "^3.6.4",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

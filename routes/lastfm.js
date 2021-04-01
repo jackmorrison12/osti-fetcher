@@ -1,6 +1,9 @@
+const listEndpoints = require("express-list-endpoints");
+
 var LastFMController = require("../api_controllers/lastfm.js");
 var SpotifyController = require("../api_controllers/spotify");
 var DB = require("../database/lastfm");
+var userDB = require("../database/user");
 
 var express = require("express"),
   router = express.Router();
@@ -10,16 +13,23 @@ function sleep(ms) {
 }
 
 router.get("/", function (req, res) {
-  res.send("Container for lastfm routes");
+  res.send(
+    listEndpoints(router).map(function (item) {
+      return item.path + " " + item.methods;
+    })
+  );
 });
 
 router.post("/userSetup", async function (req, res) {
   // Get the user object from the database
   const userId = req.body.user_id;
-  const user = await DB.getUser(userId);
+  const user = await userDB.getUser(userId);
 
   // Get that user's listening history from the LastFM API
-  let history = await LastFMController.getUserHistory(user.lastfm_username);
+  let history = await LastFMController.getUserHistory(
+    user.lastfm_username,
+    1617263475
+  );
   console.log(history.length + " listens found in history");
 
   // Iterate over history and check if songs aren't already in the database -

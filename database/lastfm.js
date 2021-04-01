@@ -22,6 +22,9 @@ module.exports = class DB {
   static async addTracks(tracks) {
     const { db } = await DBController.connectToDatabase();
     // TODO: Add createdate and updatedate fields
+    tracks.forEach(function (track) {
+      track.created_at = Math.floor(Date.now() / 1000);
+    });
     const trackIDs = await db.collection("tracks").insertMany(tracks);
     return trackIDs.ops.map(({ _id, lastfm_url }) => ({ _id, lastfm_url }));
   }

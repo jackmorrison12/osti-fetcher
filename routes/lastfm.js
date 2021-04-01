@@ -1,4 +1,3 @@
-// import { connectToDatabase } from "../controllers/mongodb";
 var LastFMController = require("../api_controllers/lastfm.js");
 var SpotifyController = require("../api_controllers/spotify");
 var DB = require("../database/lastfm");
@@ -15,18 +14,20 @@ router.get("/", function (req, res) {
 });
 
 router.post("/userSetup", async function (req, res) {
+  // Get the user object from the database
   const userId = req.body.user_id;
   const user = await DB.getUser(userId);
 
+  // Get that user's listening history from the LastFM API
   let history = await LastFMController.getUserHistory(user.lastfm_username);
-
   console.log(history.length + " listens found in history");
+
   // Iterate over history and check if songs aren't already in the database -
-  // if not then we add them to songs table, else we add the song id to each listen object, and then put it in the listen table
+  // if not then we add them to songs table, else we add the song id to each listen object,
+  // and then put it in the listen table
 
-  // DB method - pass in a list of lastfm_urls, and return an array of IDs of the ones in the db
+  // Get a list of lastfm urls of songs already in DB
   let lastfm_urls = history.map((h) => h.lastfm_url);
-
   let known_songs = await DB.getKnownSongIDs(lastfm_urls);
   let known_song_urls = known_songs.map((s) => s.lastfm_url);
 
@@ -37,20 +38,20 @@ router.post("/userSetup", async function (req, res) {
   );
 
   if (unknown_songs.length > 0) {
-    // Remove duplicate listens in history
+    // Remove duplicates
     unknown_songs = Array.from(
       new Set(unknown_songs.map((a) => a.lastfm_url))
     ).map((lastfm_url) => {
       return unknown_songs.find((a) => a.lastfm_url === lastfm_url);
     });
-    // Filter out date
-    unknown_songs = unknown_songs.map(({ date, ...rest }) => rest);
 
+    // Filter out listen date
+    unknown_songs = unknown_songs.map(({ date, ...rest }) => rest);
     console.log(unknown_songs.length + " songs are unknown");
 
     // Spotify API method - pass in a list of unknown songs, return data about them from spotify api
-
     let recognised_songs = [];
+    let unrecognised_songs = [];
 
     for (const song of unknown_songs) {
       let data = await SpotifyController.getSongData(
@@ -63,6 +64,7 @@ router.post("/userSetup", async function (req, res) {
         console.log(song.name);
         console.log(song.artist);
         console.log(song.album);
+        unrecognised_songs.push(song);
       } else {
         song.spotify = {};
         song.spotify.uri = data.uri;
@@ -98,7 +100,6 @@ router.post("/userSetup", async function (req, res) {
     );
 
     let ids = [];
-
     for (const s of recognised_songs) {
       ids.push(s.spotify.id);
     }
@@ -123,26 +124,24 @@ router.post("/userSetup", async function (req, res) {
 
     console.log("Spotify features retrieved");
 
-    // DB method - add spotify data & songs to DB + get IDs
-
-    recognised_songs = await DB.addTracks(recognised_songs);
-
+    // DB method - add songs to DB + get IDs
+    // Note - unrecognised songs are still added, as there is the opportunity for them
+    // to be added manually later
+    all_songs = recognised_songs.concat(unrecognised_songs);
+    all_songs = await DB.addTracks(all_songs);
     console.log("New songs added to database");
 
     // Combine existing IDs with returned IDs
-
-    known_songs = known_songs.concat(recognised_songs);
+    known_songs = known_songs.concat(all_songs);
   }
 
   // Translate known_songs to a dict, key url value ObjectID
-
   let song_ids = {};
   for (const song of known_songs) {
     song_ids[song.lastfm_url] = song._id;
   }
 
   // Generate the records which need to be added to the listens table (just songid and datetime of listen)
-
   let listens_to_add = [];
   for (const r of history) {
     let listen = {};
@@ -155,12 +154,11 @@ router.post("/userSetup", async function (req, res) {
   }
 
   // DB Method - Add these listens to the database
-
   DB.addListens(listens_to_add);
-
   console.log("Listens added to database");
 
-  res.json(listens_to_add);
+  // Return the number of listens added to the database
+  res.json(listens_to_add.length);
 });
 
 module.exports = router;

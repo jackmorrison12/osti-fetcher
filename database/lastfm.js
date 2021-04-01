@@ -21,7 +21,7 @@ module.exports = class DB {
 
   static async addTracks(tracks) {
     const { db } = await DBController.connectToDatabase();
-    // Add createdate and updatedate fields
+    // TODO: Add createdate and updatedate fields
     const trackIDs = await db.collection("tracks").insertMany(tracks);
     return trackIDs.ops.map(({ _id, lastfm_url }) => ({ _id, lastfm_url }));
   }

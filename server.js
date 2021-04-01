@@ -13,5 +13,9 @@ app.use(
 );
 app.use(bodyParser.json());
 
+app.get("/", function (req, res) {
+  res.send("Osti Fetcher API");
+});
+
 var lastfmRoutes = require("./routes/lastfm");
 app.use("/lastfm", lastfmRoutes);

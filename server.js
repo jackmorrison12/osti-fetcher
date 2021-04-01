@@ -2,7 +2,7 @@ var express = require("express"),
   app = express();
 let bodyParser = require("body-parser");
 
-app.listen(3000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log("listening on 3000");
 });
 

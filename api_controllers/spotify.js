@@ -45,7 +45,7 @@ module.exports = class SpotifyController {
   }
 
   static async getAudioFeaturesForTracks(tracks) {
-    //   Can only take 100 at a time
+    // Can only take 100 at a time
     let features = [];
     let num_calls = Math.ceil(tracks.length / 100);
     for (let i = 0; i < num_calls; i++) {
@@ -56,5 +56,10 @@ module.exports = class SpotifyController {
       await this.sleep(1000);
     }
     return features;
+  }
+
+  static async getAudioFeaturesForTrack(track) {
+    let result = await spotifyApi.getAudioFeaturesForTrack(track);
+    return result;
   }
 };

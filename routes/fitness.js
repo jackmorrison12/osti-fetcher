@@ -1,7 +1,7 @@
 const listEndpoints = require("express-list-endpoints");
 
-var GoogleFitontroller = require("../api_controllers/googlefit.js");
-var DB = require("../database/googlefit");
+var GoogleFitController = require("../api_controllers/googlefit.js");
+var DB = require("../database/fitness");
 var userDB = require("../database/user");
 
 var express = require("express"),

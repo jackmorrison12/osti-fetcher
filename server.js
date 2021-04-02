@@ -22,8 +22,8 @@ app.get("/", function (req, res) {
   );
 });
 
-var lastfmRoutes = require("./routes/lastfm");
-app.use("/lastfm", lastfmRoutes);
+var musicRoutes = require("./routes/music");
+app.use("/music", musicRoutes);
 
-var googlefitRoutes = require("./routes/googlefit");
-app.use("/googlefit", googlefitRoutes);
+var fitnessRoutes = require("./routes/fitness");
+app.use("/fitness", fitnessRoutes);

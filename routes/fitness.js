@@ -34,7 +34,6 @@ router.post("/userSetup", async function (req, res) {
   // get tokens from db for this user
   const user = await userDB.getUser(user_id);
 
-  console.log(user.google_tokens);
   oauth2Client.setCredentials(user.google_tokens);
 
   const fitness = google.fitness({ version: "v1", auth: oauth2Client });
@@ -94,6 +93,7 @@ router.post("/userSetup", async function (req, res) {
 
     for (const workout of result.data.bucket) {
       var w = {};
+      w.user_id = user_id;
       w.start_time = workout.startTimeMillis;
       w.end_time = workout.endTimeMillis;
       w.activity_type = workout.session.name;
@@ -127,18 +127,81 @@ router.post("/userSetup", async function (req, res) {
     }
   }
 
-  console.log(workouts);
-  console.log(workouts.length);
-
-  res.json(workouts);
-
   // now we have a list of workouts - we need to augment with the datapoints
   // - for each, do an API call to get the datapoints of each workout and augment the object
 
+  let full_workouts = [];
+
+  for (const workout of workouts) {
+    let result = await fitness.users.dataset.aggregate({
+      userId: "me",
+      requestBody: {
+        startTimeMillis: workout.start_time,
+        endTimeMillis: workout.end_time,
+        aggregateBy: [
+          {
+            dataTypeName: "com.google.calories.expended",
+          },
+          {
+            dataTypeName: "com.google.active_minutes",
+          },
+          {
+            dataTypeName: "com.google.step_count.delta",
+          },
+          {
+            dataTypeName: "com.google.distance.delta",
+          },
+          {
+            dataTypeName: "com.google.speed",
+          },
+          {
+            dataTypeName: "com.google.heart_rate.bpm",
+          },
+        ],
+        bucketByTime: { durationMillis: 10000 },
+      },
+    });
+
+    points = [];
+
+    for (const point of result.data.bucket) {
+      var p = {};
+
+      p.start_time = point.startTimeMillis;
+      p.end_time = point.endTimeMillis;
+      if (point.dataset[0].point[0]) {
+        p.calories_burned = point.dataset[0].point[0].value[0].fpVal;
+      }
+      if (point.dataset[1].point[0]) {
+        p.active = point.dataset[1].point[0].value[0].intVal;
+      }
+      if (point.dataset[2].point[0]) {
+        p.steps = point.dataset[2].point[0].value[0].intVal;
+      }
+      if (point.dataset[3].point[0]) {
+        p.distance = point.dataset[3].point[0].value[0].fpVal;
+      }
+      if (point.dataset[4].point[0]) {
+        p.speed = point.dataset[4].point[0].value[0].fpVal;
+      }
+      if (point.dataset[5].point[0]) {
+        p.heart_rate = point.dataset[5].point[0].value[0].fpVal;
+      }
+      points.push(p);
+    }
+
+    workout.data = points;
+
+    full_workouts.push(workout);
+  }
+
   // add the workouts to the database
 
+  DB.addWorkouts(full_workouts);
 
-// TEST CALL 
+  res.json(full_workouts.length);
+
+  // TEST CALL
 
   // let result = await fitness.users.dataset.aggregate({
   //   userId: "me",

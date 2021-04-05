@@ -40,4 +40,16 @@ module.exports = class DB {
       .toArray();
     return time[0].time;
   }
+
+  static async getFirstListenTime(user_id) {
+    const { db } = await DBController.connectToDatabase();
+    const time = await db
+      .collection("listens")
+      .find({ user_id: user_id })
+      .sort({ time: 1 })
+      .limit(1)
+      .project({ time: 1 })
+      .toArray();
+    return time[0].time;
+  }
 };

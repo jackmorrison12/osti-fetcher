@@ -1,5 +1,8 @@
 const listEndpoints = require("express-list-endpoints");
 
+var DBController = require("./database/mongodb.js");
+var ObjectId = require("mongodb").ObjectId;
+
 var express = require("express"),
   app = express();
 
@@ -27,3 +30,14 @@ app.use("/music", musicRoutes);
 
 var fitnessRoutes = require("./routes/fitness");
 app.use("/fitness", fitnessRoutes);
+
+// Endpoint to test queries in js format
+app.post("/test", async function (req, res) {
+  const { db } = await DBController.connectToDatabase();
+  const status = await db
+    .collection("users")
+    .find({ _id: ObjectId(req.body.user_id) })
+    .project({ status: 1, _id: 0 })
+    .toArray();
+  res.json(status);
+});

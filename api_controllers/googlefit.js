@@ -62,6 +62,16 @@ module.exports = class GoogleFitController {
         },
       });
 
+      // Check if the first workout is a duplicate - if so, don't add it again
+      if (
+        result.data.bucket[0] &&
+        workouts.length > 0 &&
+        workouts[workouts.length - 1].start_time ==
+          result.data.bucket[0].startTimeMillis
+      ) {
+        result.data.bucket.splice(0, 1);
+      }
+
       for (const workout of result.data.bucket) {
         var w = {};
         w.user_id = user_id;

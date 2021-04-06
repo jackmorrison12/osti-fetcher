@@ -1,18 +1,9 @@
 const listEndpoints = require("express-list-endpoints");
 
-var LastFMController = require("../api_controllers/lastfm.js");
-var SpotifyController = require("../api_controllers/spotify");
-var DB = require("../database/music");
-var userDB = require("../database/user");
-
 var MusicController = require("../controllers/music.js");
 
 var express = require("express"),
   router = express.Router();
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 router.get("/", function (req, res) {
   res.send(

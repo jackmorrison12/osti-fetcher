@@ -168,7 +168,7 @@ module.exports = class MusicController {
     }
 
     // DB Method - Add these listens to the database
-    DB.addListens(listens_to_add);
+    await DB.addListens(listens_to_add);
     console.log("Listens added to database");
 
     return listens_to_add.length;

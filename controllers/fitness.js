@@ -72,7 +72,7 @@ module.exports = class MusicController {
     }
 
     // Add the workouts to the database
-    DB.addWorkouts(full_workouts);
+    await DB.addWorkouts(full_workouts);
 
     console.log("Workouts added to database");
 

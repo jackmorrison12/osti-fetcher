@@ -17,6 +17,19 @@ app.use(
 );
 app.use(express.json());
 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://osti.uk");
+  if (process.env.NODE_ENV === "development") {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  }
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
 app.get("/", function (req, res) {
   res.send(
     listEndpoints(app).map(function (item) {
@@ -34,10 +47,16 @@ app.use("/fitness", fitnessRoutes);
 // Endpoint to test queries in js format
 app.post("/test", async function (req, res) {
   const { db } = await DBController.connectToDatabase();
-  const status = await db
-    .collection("users")
-    .find({ _id: ObjectId(req.body.user_id) })
-    .project({ status: 1, _id: 0 })
-    .toArray();
-  res.json(status);
+  try {
+    const status = await db
+      .collection("users")
+      .find({ _id: ObjectId(req.body.user_id) })
+      .project({ status: 1, _id: 0 })
+      .toArray();
+    console.log("Endpoint hit by " + req.headers.referer);
+    res.json(status);
+  } catch (e) {
+    console.log("Incorrect or no body");
+    res.json("Incorrect or no body");
+  }
 });

@@ -57,6 +57,16 @@ app.post("/setup", async function (req, res) {
   await UserController.setStatus(req.body.user_id, "fetched");
 });
 
+// General update endpoint
+app.post("/update", async function (req, res) {
+  res.json("fetching_lastfm");
+  await UserController.setStatus(req.body.user_id, "fetching_lastfm");
+  await MusicController.getRecentListensForUser(req.body.user_id);
+  await UserController.setStatus(req.body.user_id, "fetching_googlefit");
+  await FitnessController.getRecentWorkoutsForUser(req.body.user_id);
+  await UserController.setStatus(req.body.user_id, "fetched");
+});
+
 // Endpoint to test queries in js format
 app.post("/test", async function (req, res) {
   const { db } = await DBController.connectToDatabase();

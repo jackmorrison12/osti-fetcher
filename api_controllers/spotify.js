@@ -35,13 +35,18 @@ module.exports = class SpotifyController {
     track = track.replace(/\((ft|feat).*\)/i, "");
     artist = artist.replace(/((ft|feat).*)/i, "");
     album = album.replace(/((ft|feat).*)/i, "");
-    let data = await spotifyApi.searchTracks(
-      "track:" + track + " artist:" + artist + " album:" + album
-    );
-    if (data.body.tracks.total > 0) {
-      return data.body.tracks.items[0];
+    try {
+      let data = await spotifyApi.searchTracks(
+        "track:" + track + " artist:" + artist + " album:" + album
+      );
+      if (data.body.tracks.total > 0) {
+        return data.body.tracks.items[0];
+      }
+
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
   static async getAudioFeaturesForTracks(tracks) {

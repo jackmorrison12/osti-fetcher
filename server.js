@@ -49,7 +49,7 @@ app.use("/fitness", fitnessRoutes);
 
 // General setup endpoint
 app.post("/setup", async function (req, res) {
-  res.json(true);
+  res.json("fetching_lastfm");
   await UserController.setStatus(req.body.user_id, "fetching_lastfm");
   await MusicController.userSetup(req.body.user_id);
   await UserController.setStatus(req.body.user_id, "fetching_googlefit");

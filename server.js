@@ -50,7 +50,7 @@ app.use("/fitness", fitnessRoutes);
 // General setup endpoint
 app.post("/setup", async function (req, res) {
   const current_status = await UserController.getStatus(req.body.user_id);
-  if (current_status != "api_linked") {
+  if (current_status == "api_linked") {
     res.json("fetching_lastfm");
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     // await MusicController.userSetup(req.body.user_id);
@@ -65,7 +65,7 @@ app.post("/setup", async function (req, res) {
 // General update endpoint
 app.post("/update", async function (req, res) {
   const current_status = await UserController.getStatus(req.body.user_id);
-  if (current_status != "fetched") {
+  if (current_status == "fetched") {
     res.json("fetching_lastfm");
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     await MusicController.getRecentListensForUser(req.body.user_id);

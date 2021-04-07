@@ -45,6 +45,20 @@ module.exports = class SpotifyController {
 
       return null;
     } catch (e) {
+      // Update the access token
+      spotifyApi.clientCredentialsGrant().then(
+        function (data) {
+          console.log("Access Token Retrieved");
+          // Save the access token so that it's used in future calls
+          spotifyApi.setAccessToken(data.body["access_token"]);
+        },
+        function (err) {
+          console.log(
+            "Something went wrong when retrieving an access token",
+            err
+          );
+        }
+      );
       return null;
     }
   }

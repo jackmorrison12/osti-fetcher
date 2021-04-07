@@ -21,4 +21,14 @@ module.exports = class userDB {
       );
     return result;
   }
+
+  static async getStatus(user_id) {
+    const { db } = await DBController.connectToDatabase();
+    const result = await db
+      .collection("users")
+      .find({ _id: ObjectId(user_id) })
+      .project({ status: 1 })
+      .toArray();
+    return result[0].status;
+  }
 };

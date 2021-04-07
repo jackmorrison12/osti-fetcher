@@ -11,4 +11,8 @@ module.exports = class UserController {
     console.log("Setting status for user " + user_id + " to " + status);
     return await DB.setStatus(user_id, status);
   }
+
+  static async getStatus(user_id) {
+    return await DB.getStatus(user_id);
+  }
 };

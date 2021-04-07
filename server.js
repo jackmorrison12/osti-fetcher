@@ -53,7 +53,7 @@ app.post("/setup", async function (req, res) {
   if (current_status == "api_linked") {
     res.json("fetching_lastfm");
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
-    // await MusicController.userSetup(req.body.user_id);
+    await MusicController.userSetup(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetching_googlefit");
     await FitnessController.userSetup(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetched");

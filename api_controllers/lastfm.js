@@ -45,6 +45,7 @@ module.exports = class LastFMController {
     let pages = data.recenttracks["@attr"].totalPages;
 
     for (let i = 2; i <= pages; i++) {
+      console.log("Fetching LastFM page " + i + " of " + pages);
       await sleep(1000);
       data = await lastFm.userGetRecentTracks({
         user: username,

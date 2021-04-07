@@ -116,20 +116,24 @@ module.exports = class MusicController {
       let features = await SpotifyController.getAudioFeaturesForTracks(ids);
 
       for (let i = 0; i < features.length; i++) {
-        recognised_songs[i].features.danceability = features[i].danceability;
-        recognised_songs[i].features.energy = features[i].energy;
-        recognised_songs[i].features.key = features[i].key;
-        recognised_songs[i].features.loudness = features[i].loudness;
-        recognised_songs[i].features.mode = features[i].mode;
-        recognised_songs[i].features.speechiness = features[i].speechiness;
-        recognised_songs[i].features.acousticness = features[i].acousticness;
-        recognised_songs[i].features.instrumentalness =
-          features[i].instrumentalness;
-        recognised_songs[i].features.liveness = features[i].liveness;
-        recognised_songs[i].features.valence = features[i].valence;
-        recognised_songs[i].features.tempo = features[i].tempo;
-        recognised_songs[i].features.time_signature =
-          features[i].time_signature;
+        if (features[i]) {
+          recognised_songs[i].features.danceability = features[i].danceability;
+          recognised_songs[i].features.energy = features[i].energy;
+          recognised_songs[i].features.key = features[i].key;
+          recognised_songs[i].features.loudness = features[i].loudness;
+          recognised_songs[i].features.mode = features[i].mode;
+          recognised_songs[i].features.speechiness = features[i].speechiness;
+          recognised_songs[i].features.acousticness = features[i].acousticness;
+          recognised_songs[i].features.instrumentalness =
+            features[i].instrumentalness;
+          recognised_songs[i].features.liveness = features[i].liveness;
+          recognised_songs[i].features.valence = features[i].valence;
+          recognised_songs[i].features.tempo = features[i].tempo;
+          recognised_songs[i].features.time_signature =
+            features[i].time_signature;
+        } else {
+          console.log("No features for: " + recognised_songs[i].name);
+        }
       }
 
       console.log("Spotify features retrieved");

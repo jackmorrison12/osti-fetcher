@@ -56,7 +56,7 @@ app.post("/test", async function (req, res) {
     console.log("Endpoint hit by " + req.headers.referer);
     res.json(status);
   } catch (e) {
-    console.log("Incorrect or no body");
+    console.log("Endpoint incorrectly hit by " + req.headers.referer);
     res.json("Incorrect or no body");
   }
 });

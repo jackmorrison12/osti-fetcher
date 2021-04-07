@@ -10,4 +10,15 @@ module.exports = class userDB {
     return user;
   }
 
+  static async setStatus(user_id, status) {
+    const { db } = await DBController.connectToDatabase();
+    const result = await db
+      .collection("users")
+      .updateOne(
+        { _id: ObjectId(user_id) },
+        { $set: { status: status } },
+        { upsert: true }
+      );
+    return result;
+  }
 };

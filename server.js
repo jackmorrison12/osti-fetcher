@@ -1,5 +1,8 @@
 const listEndpoints = require("express-list-endpoints");
 
+var UserController = require("./controllers/user.js");
+var MusicController = require("./controllers/music.js");
+var FitnessController = require("./controllers/fitness.js");
 var DBController = require("./database/mongodb.js");
 var ObjectId = require("mongodb").ObjectId;
 
@@ -43,6 +46,16 @@ app.use("/music", musicRoutes);
 
 var fitnessRoutes = require("./routes/fitness");
 app.use("/fitness", fitnessRoutes);
+
+// General setup endpoint
+app.post("/setup", async function (req, res) {
+  res.json(true);
+  await UserController.setStatus(req.body.user_id, "fetching_lastfm");
+  await MusicController.userSetup(req.body.user_id);
+  await UserController.setStatus(req.body.user_id, "fetching_googlefit");
+  await FitnessController.userSetup(req.body.user_id);
+  await UserController.setStatus(req.body.user_id, "fetched");
+});
 
 // Endpoint to test queries in js format
 app.post("/test", async function (req, res) {

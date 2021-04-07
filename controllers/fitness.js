@@ -19,6 +19,8 @@ module.exports = class MusicController {
       start_time
     );
 
+    console.log(workouts.length + " workouts found");
+
     // now we have a list of workouts - we need to augment with the datapoints
     // - for each, do an API call to get the datapoints of each workout and augment the object
 
@@ -66,6 +68,8 @@ module.exports = class MusicController {
 
     // Add the workouts to the database
     DB.addWorkouts(full_workouts);
+
+    console.log("Workouts added to database");
 
     return full_workouts.length;
   }

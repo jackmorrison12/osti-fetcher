@@ -19,6 +19,11 @@ module.exports = class MusicController {
       start_time
     );
 
+    if (workouts.length == 0) {
+      console.log("No workouts found");
+      return 0;
+    }
+
     console.log(workouts.length + " workouts found");
 
     // now we have a list of workouts - we need to augment with the datapoints
@@ -77,7 +82,7 @@ module.exports = class MusicController {
   static async getRecentWorkoutsForUser(user_id) {
     // Look up in the database when the end of their last workout was
     let time = await DB.getLastWorkoutTime(user_id);
-    return await this.addWorkouts(user_id, time + 1);
+    return await this.addWorkouts(user_id, parseInt(time) + 1);
   }
 
   static async userSetup(user_id) {

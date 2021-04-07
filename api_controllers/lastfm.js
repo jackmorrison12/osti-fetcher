@@ -39,7 +39,12 @@ module.exports = class LastFMController {
     if (data.recenttracks.track.length == 0) {
       return null;
     }
-
+    if (
+      !Array.isArray(data.recenttracks.track) &&
+      data.recenttracks.track["@attr"]
+    ) {
+      return null;
+    }
     let results = this.filterHistory(data.recenttracks.track);
 
     let pages = data.recenttracks["@attr"].totalPages;

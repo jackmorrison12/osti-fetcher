@@ -177,8 +177,7 @@ module.exports = class MusicController {
   static async getRecentListensForUser(user_id) {
     // Look up in the database when their last recorded listen was
     let time = await DB.getLastListenTime(user_id);
-
-    return await this.addListens(user_id, time + 1);
+    return await this.addListens(user_id, parseInt(time) + 1);
   }
 
   static async userSetup(user_id) {

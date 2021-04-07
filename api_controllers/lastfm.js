@@ -44,16 +44,16 @@ module.exports = class LastFMController {
 
     let pages = data.recenttracks["@attr"].totalPages;
 
-    // for (let i = 2; i <= pages; i++) {
-    //   await sleep(1000);
-    //   data = await lastFm.userGetRecentTracks({
-    //     user: username,
-    //     limit: 200,
-    //     page: i,
-    //     from: startTime ? startTime : 0,
-    //   });
-    //   results.push(...this.filterHistory(data.recenttracks.track));
-    // }
+    for (let i = 2; i <= pages; i++) {
+      await sleep(1000);
+      data = await lastFm.userGetRecentTracks({
+        user: username,
+        limit: 200,
+        page: i,
+        from: startTime ? startTime : 0,
+      });
+      results.push(...this.filterHistory(data.recenttracks.track));
+    }
 
     return results;
   }

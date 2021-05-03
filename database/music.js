@@ -14,6 +14,16 @@ module.exports = class DB {
     return knownSongs;
   }
 
+  static async getNonLastfmSongs(uris) {
+    const { db } = await DBController.connectToDatabase();
+    const nonLastfmsongs = await db
+      .collection("tracks")
+      .find({ "spotify.uri": { $in: uris } })
+      .project({ "spotify.uri": 1 })
+      .toArray();
+    return nonLastfmsongs;
+  }
+
   static async addTracks(tracks) {
     const { db } = await DBController.connectToDatabase();
     tracks.forEach(function (track) {
@@ -21,6 +31,18 @@ module.exports = class DB {
     });
     const trackIDs = await db.collection("tracks").insertMany(tracks);
     return trackIDs.ops.map(({ _id, lastfm_url }) => ({ _id, lastfm_url }));
+  }
+
+  static async addLastfmURL(uri, lastfm_url) {
+    const { db } = await DBController.connectToDatabase();
+    const res = await db
+      .collection("tracks")
+      .updateOne(
+        { "spotify.uri": uri },
+        { $set: { lastfm_url: lastfm_url } },
+        { upsert: true }
+      );
+    return res;
   }
 
   static async addListens(listens) {

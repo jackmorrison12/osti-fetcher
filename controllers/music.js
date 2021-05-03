@@ -141,7 +141,33 @@ module.exports = class MusicController {
       // DB method - add songs to DB + get IDs
       // Note - unrecognised songs are still added, as there is the opportunity for them
       // to be added manually later
-      var all_songs = recognised_songs.concat(unrecognised_songs);
+
+      // Songs may already be in there without lastfm url:
+      // Get a list of spotify uris, and then if any of them already exist in the database, then just add the
+      // appropriate lastfm url rather than re-adding
+
+      let uris = [];
+      for (const song of recognised_songs) {
+        uris.push(song.spotify.uri);
+      }
+      let non_lastfm_songs = await DB.getNonLastfmSongs(uris);
+      non_lastfm_songs = non_lastfm_songs.map((s) => s.spotify.uri);
+
+      let recognised_songs_without_non_lastfm = [];
+
+      for (const song of recognised_songs) {
+        if (non_lastfm_songs.includes(song.spotify.uri)) {
+          console.log(
+            "Adding " + song.spotify.uri + " to url " + song.lastfm_url
+          );
+          let res = await DB.addLastfmURL(song.spotify.uri, song.lastfm_url);
+        } else {
+          recognised_songs_without_non_lastfm.push(song);
+        }
+      }
+      var all_songs = recognised_songs_without_non_lastfm.concat(
+        unrecognised_songs
+      );
       all_songs = await DB.addTracks(all_songs);
       console.log("New songs added to database");
 

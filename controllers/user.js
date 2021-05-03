@@ -15,4 +15,8 @@ module.exports = class UserController {
   static async getStatus(user_id) {
     return await DB.getStatus(user_id);
   }
+
+  static async getSetupUsers() {
+    return await DB.getSetupUsers();
+  }
 };

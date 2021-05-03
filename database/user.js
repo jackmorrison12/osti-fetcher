@@ -10,6 +10,16 @@ module.exports = class userDB {
     return user;
   }
 
+  static async getSetupUsers() {
+    const { db } = await DBController.connectToDatabase();
+    const users = await db
+      .collection("users")
+      .find({ status: "fetched" })
+      .project({ _id: 1 })
+      .toArray();
+    return users;
+  }
+
   static async setStatus(user_id, status) {
     const { db } = await DBController.connectToDatabase();
     const result = await db

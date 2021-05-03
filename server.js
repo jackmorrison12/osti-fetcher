@@ -77,6 +77,23 @@ app.post("/update", async function (req, res) {
   }
 });
 
+// Update all users
+app.post("/updateAll", async function (req, res) {
+  let users = await UserController.getSetupUsers();
+  res.json("Fetching all users");
+  for (const user of users) {
+    user_id = user._id.toString();
+    const current_status = await UserController.getStatus(user_id);
+    if (current_status == "fetched") {
+      await UserController.setStatus(user_id, "fetching_lastfm");
+      await MusicController.getRecentListensForUser(user_id);
+      await UserController.setStatus(user_id, "fetching_googlefit");
+      await FitnessController.getRecentWorkoutsForUser(user_id);
+      await UserController.setStatus(user_id, "fetched");
+    }
+  }
+});
+
 // Endpoint to test queries in js format
 app.post("/test", async function (req, res) {
   const { db } = await DBController.connectToDatabase();

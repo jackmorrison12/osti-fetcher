@@ -26,6 +26,57 @@ module.exports = class MusicController {
 
     console.log(workouts.length + " workouts found");
 
+    // Get a list of all workout types
+
+    let workout_types_set = new Set();
+
+    for (const workout of workouts) {
+      workout_types_set.add(workout.activity_type);
+    }
+
+    let workout_types = [...workout_types_set];
+
+    // Check database if they already exist / are in the duplicates for any of them
+    // Return a list of these rows
+
+    let existing_workout_types = await DB.getExistingWorkoutTypes(
+      workout_types
+    );
+
+    let workout_map = {};
+    for (const workout of existing_workout_types) {
+      workout_map[workout.name] = {
+        id: workout._id.toString(),
+        name: workout.name,
+      };
+      for (const duplicate of workout.duplicates) {
+        workout_map[duplicate] = {
+          id: workout._id.toString(),
+          name: workout.name,
+        };
+      }
+    }
+
+    // For any which don't exist, create them in the db
+    let unknown_workout_types = [];
+    for (const workout of workout_types) {
+      if (!(workout in workout_map)) {
+        unknown_workout_types.push({ name: workout, duplicates: [] });
+      }
+    }
+
+    if (unknown_workout_types.length > 0) {
+      let new_workout_types = await DB.addNewWorkoutTypes(
+        unknown_workout_types
+      );
+      for (const workout of new_workout_types) {
+        workout_map[workout.name] = {
+          id: workout._id.toString(),
+          name: workout.name,
+        };
+      }
+    }
+
     // now we have a list of workouts - we need to augment with the datapoints
     // - for each, do an API call to get the datapoints of each workout and augment the object
 
@@ -67,6 +118,12 @@ module.exports = class MusicController {
       }
 
       workout.data = points;
+
+      // Augment each workout with the workout_id from that table, and if it has a name in the
+      // duplicates, then give it the proper name
+
+      workout.activity_type = workout_map[workout.activity_type].name;
+      workout.workout_id = workout_map[workout.activity_type].id;
 
       full_workouts.push(workout);
     }

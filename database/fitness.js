@@ -10,6 +10,30 @@ module.exports = class DB {
     return workoutIDs;
   }
 
+  static async addNewWorkoutTypes(workouts) {
+    const { db } = await DBController.connectToDatabase();
+    const workoutTypeIDs = await db
+      .collection("workout_types")
+      .insertMany(workouts);
+    if (workoutTypeIDs.insertedCount > 0) {
+      return workoutTypeIDs.ops;
+    }
+    return [];
+  }
+
+  static async getExistingWorkoutTypes(workout_types) {
+    const { db } = await DBController.connectToDatabase();
+    const workouts = await db
+      .collection("workout_types")
+      .find({ name: { $in: workout_types } })
+      .toArray();
+    const workouts_duplicates = await db
+      .collection("workout_types")
+      .find({ duplicates: { $in: workout_types } })
+      .toArray();
+    return [...workouts, ...workouts_duplicates];
+  }
+
   static async getLastWorkoutTime(user_id) {
     const { db } = await DBController.connectToDatabase();
     const time = await db

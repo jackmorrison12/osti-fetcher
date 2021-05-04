@@ -72,6 +72,10 @@ module.exports = class DB {
       .limit(1)
       .project({ time: 1 })
       .toArray();
-    return time[0].time;
+    if (time.length > 0) {
+      return time[0].time;
+    } else {
+      return Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7 * 10;
+    }
   }
 };

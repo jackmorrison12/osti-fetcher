@@ -82,7 +82,7 @@ module.exports = class MusicController {
   static async getRecentWorkoutsForUser(user_id) {
     // Look up in the database when the end of their last workout was
     let time = await DB.getLastWorkoutTime(user_id);
-    return await this.addWorkouts(user_id, parseInt(time) + 1);
+    return await this.addWorkouts(user_id, parseInt(time) / 1000 + 1);
   }
 
   static async userSetup(user_id) {

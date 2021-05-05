@@ -161,6 +161,7 @@ module.exports = class MusicController {
             "Adding " + song.spotify.uri + " to url " + song.lastfm_url
           );
           let res = await DB.addLastfmURL(song.spotify.uri, song.lastfm_url);
+          known_songs.push(res);
         } else {
           recognised_songs_without_non_lastfm.push(song);
         }
@@ -168,8 +169,10 @@ module.exports = class MusicController {
       var all_songs = recognised_songs_without_non_lastfm.concat(
         unrecognised_songs
       );
-      all_songs = await DB.addTracks(all_songs);
-      console.log("New songs added to database");
+      if (all_songs.length > 0) {
+        all_songs = await DB.addTracks(all_songs);
+        console.log("New songs added to database");
+      }
 
       // Combine existing IDs with returned IDs
       known_songs = known_songs.concat(all_songs);

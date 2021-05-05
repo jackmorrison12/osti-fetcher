@@ -37,12 +37,12 @@ module.exports = class DB {
     const { db } = await DBController.connectToDatabase();
     const res = await db
       .collection("tracks")
-      .updateOne(
+      .findOneAndUpdate(
         { "spotify.uri": uri },
         { $set: { lastfm_url: lastfm_url } },
         { upsert: true }
       );
-    return res;
+    return { _id: res.value._id.toString(), lastfm_url: lastfm_url };
   }
 
   static async addListens(listens) {

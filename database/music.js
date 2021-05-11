@@ -42,7 +42,7 @@ module.exports = class DB {
         { $set: { lastfm_url: lastfm_url } },
         { upsert: true }
       );
-    return { _id: res.value._id.toString(), lastfm_url: lastfm_url };
+    return { _id: res.value._id, lastfm_url: lastfm_url };
   }
 
   static async addListens(listens) {

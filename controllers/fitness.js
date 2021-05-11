@@ -13,11 +13,17 @@ module.exports = class MusicController {
   static async addWorkouts(user_id, start_time) {
     const user = await userDB.getUser(user_id);
 
-    var workouts = await GoogleFitController.getWorkouts(
-      user_id,
-      user.google_tokens,
-      start_time
-    );
+    try {
+      var workouts = await GoogleFitController.getWorkouts(
+        user_id,
+        user.google_tokens,
+        start_time
+      );
+    } catch (e) {
+      console.log("Error connecting to Google Fit - Probably Expired Token");
+      console.log(e);
+      return null;
+    }
 
     if (workouts.length == 0) {
       console.log("No workouts found");

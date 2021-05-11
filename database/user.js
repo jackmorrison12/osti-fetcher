@@ -14,7 +14,7 @@ module.exports = class userDB {
     const { db } = await DBController.connectToDatabase();
     const users = await db
       .collection("users")
-      .find({ status: "fetched" })
+      .find({ status: { $in: ["fetch_error", "fetched"] } })
       .project({ _id: 1 })
       .toArray();
     return users;

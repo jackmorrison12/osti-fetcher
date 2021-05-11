@@ -22,7 +22,7 @@ module.exports = class MusicController {
     } catch (e) {
       console.log("Error connecting to Google Fit - Probably Expired Token");
       console.log(e);
-      return null;
+      return -1;
     }
 
     if (workouts.length == 0) {

@@ -55,8 +55,12 @@ app.post("/setup", async function (req, res) {
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     await MusicController.userSetup(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetching_googlefit");
-    await FitnessController.userSetup(req.body.user_id);
-    await UserController.setStatus(req.body.user_id, "fetched");
+    let res = await FitnessController.userSetup(req.body.user_id);
+    if (res == -1) {
+      await UserController.setStatus(req.body.user_id, "fetch_error");
+    } else {
+      await UserController.setStatus(req.body.user_id, "fetched");
+    }
   } else {
     res.json("Setup Already Completed / APIs not yet linked");
   }
@@ -65,13 +69,19 @@ app.post("/setup", async function (req, res) {
 // General update endpoint
 app.post("/update", async function (req, res) {
   const current_status = await UserController.getStatus(req.body.user_id);
-  if (current_status == "fetched") {
+  if (["fetched", "fetch_error"].includes(current_status)) {
     res.json("fetching_lastfm");
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     await MusicController.getRecentListensForUser(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetching_googlefit");
-    await FitnessController.getRecentWorkoutsForUser(req.body.user_id);
-    await UserController.setStatus(req.body.user_id, "fetched");
+    let res = await FitnessController.getRecentWorkoutsForUser(
+      req.body.user_id
+    );
+    if (res == -1) {
+      await UserController.setStatus(req.body.user_id, "fetch_error");
+    } else {
+      await UserController.setStatus(req.body.user_id, "fetched");
+    }
   } else {
     res.json("Fetching already in progress");
   }
@@ -84,12 +94,17 @@ app.post("/updateAll", async function (req, res) {
   for (const user of users) {
     user_id = user._id.toString();
     const current_status = await UserController.getStatus(user_id);
-    if (current_status == "fetched") {
+    console.log(current_status);
+    if (["fetched", "fetch_error"].includes(current_status)) {
       await UserController.setStatus(user_id, "fetching_lastfm");
       await MusicController.getRecentListensForUser(user_id);
       await UserController.setStatus(user_id, "fetching_googlefit");
-      await FitnessController.getRecentWorkoutsForUser(user_id);
-      await UserController.setStatus(user_id, "fetched");
+      let res = await FitnessController.getRecentWorkoutsForUser(user_id);
+      if (res == -1) {
+        await UserController.setStatus(user_id, "fetch_error");
+      } else {
+        await UserController.setStatus(user_id, "fetched");
+      }
     }
   }
 });

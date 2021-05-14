@@ -55,8 +55,8 @@ app.post("/setup", async function (req, res) {
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     await MusicController.userSetup(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetching_googlefit");
-    let res = await FitnessController.userSetup(req.body.user_id);
-    if (res == -1) {
+    let result = await FitnessController.userSetup(req.body.user_id);
+    if (result == -1) {
       await UserController.setStatus(req.body.user_id, "fetch_error");
     } else {
       await UserController.setStatus(req.body.user_id, "fetched");
@@ -74,10 +74,10 @@ app.post("/update", async function (req, res) {
     await UserController.setStatus(req.body.user_id, "fetching_lastfm");
     await MusicController.getRecentListensForUser(req.body.user_id);
     await UserController.setStatus(req.body.user_id, "fetching_googlefit");
-    let res = await FitnessController.getRecentWorkoutsForUser(
+    let result = await FitnessController.getRecentWorkoutsForUser(
       req.body.user_id
     );
-    if (res == -1) {
+    if (result == -1) {
       await UserController.setStatus(req.body.user_id, "fetch_error");
     } else {
       await UserController.setStatus(req.body.user_id, "fetched");
@@ -99,8 +99,8 @@ app.post("/updateAll", async function (req, res) {
       await UserController.setStatus(user_id, "fetching_lastfm");
       await MusicController.getRecentListensForUser(user_id);
       await UserController.setStatus(user_id, "fetching_googlefit");
-      let res = await FitnessController.getRecentWorkoutsForUser(user_id);
-      if (res == -1) {
+      let result = await FitnessController.getRecentWorkoutsForUser(user_id);
+      if (result == -1) {
         await UserController.setStatus(user_id, "fetch_error");
       } else {
         await UserController.setStatus(user_id, "fetched");

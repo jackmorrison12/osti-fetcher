@@ -83,7 +83,7 @@ module.exports = class MusicController {
       }
     }
 
-    // now we have a list of workouts - we need to augment with the datapoints
+    // Now we have a list of workouts - we need to augment with the datapoints
     // - for each, do an API call to get the datapoints of each workout and augment the object
 
     let full_workouts = [];

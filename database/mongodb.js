@@ -1,6 +1,5 @@
-// Code Source: https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/util/mongodb.js
+// This file is based on code from: https://github.com/vercel/next.js/blob/canary/examples/with-mongodb/util/mongodb.js
 
-// import { MongoClient } from "mongodb";
 var MongoClient = require("mongodb");
 
 require("dotenv").config({

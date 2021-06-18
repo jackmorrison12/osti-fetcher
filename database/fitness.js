@@ -46,6 +46,7 @@ module.exports = class DB {
     if (time.length > 0) {
       return time[0].end_time;
     } else {
+      // Use the last 10 weeks of data
       return Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7 * 10;
     }
   }
